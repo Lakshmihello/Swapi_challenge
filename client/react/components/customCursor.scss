@@ -1,0 +1,14 @@
+.cursor {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  transform-origin: top left;
+  transform: translate(-36%, 36%) rotate(-45deg);
+  z-index: 999;
+  pointer-events: none;
+  background-image: url('../assets/lightsaber.png');
+  background-size: contain;
+}

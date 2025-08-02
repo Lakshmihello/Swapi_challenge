@@ -1,0 +1,19 @@
+@use '../../colors';
+
+.nav {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+
+  a {
+    border: 1px solid colors.$primary;
+    padding: 4px 12px;
+    background-color: colors.$background;
+    border-radius: 2px;
+
+    &.active {
+      background-color: colors.$primary;
+      color: colors.$background;
+    }
+  }
+}

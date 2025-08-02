@@ -1,0 +1,44 @@
+@use '../colors';
+
+.app {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
+  max-width: 940px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.list {
+  flex-grow: 1;
+  overflow-y: auto;
+
+  .listItem {
+    display: block;
+    padding: 10px 20px;
+    border-bottom: 1px solid colors.$border;
+
+    &:hover {
+      text-decoration: none;
+      background-color: colors.$primary;
+      color: colors.$background;
+    }
+  }
+}
+
+.details {
+  display: table;
+  border: 1px solid colors.$border;
+  background-color: colors.$backgroundSecondary;
+  margin: 0 10px;
+
+  .detailItem {
+    display: table-row;
+  }
+
+  .detailName, .detailValue {
+    display: table-cell;
+    padding: 4px 8px;
+  }
+}

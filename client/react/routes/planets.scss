@@ -1,0 +1,23 @@
+@use '../../colors';
+
+.planets {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.filterBox {
+  background-color: colors.$background;
+  border-radius: 2px;
+  border: 1px solid colors.$primary;
+  color: colors.$text;
+  margin: 0 8px 4px 8px;
+  max-width: 240px;
+  outline: none;
+  padding: 8px;
+
+  &::placeholder {
+    color: colors.$border;
+  }
+}
