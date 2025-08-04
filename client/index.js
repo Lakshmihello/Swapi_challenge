@@ -1,10 +1,10 @@
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
-import App from './react/App';
+import App from './react/App.jsx';
 import styles from './main.scss';
-import StarWarsStore from './stores/StarWars.store';
-import { Provider } from './stores/StoreProvider';
+import StarWarsStore from './stores/StarWars.store.js';
+import { Provider } from './stores/StoreProvider.js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

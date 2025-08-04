@@ -2,6 +2,7 @@
   "name": "code-challenge",
   "version": "1.0.0",
   "description": "",
+  "type":"module",
   "scripts": {
     "start": "node server/index.js",
     "watch-node": "nodemon server/index.js",

@@ -1,8 +1,8 @@
 import { types, getSnapshot } from 'mobx-state-tree';
 
-import apiService from '../services/api';
-import PlanetModel from '../models/Planet.model';
-import PersonModel from '../models/Person.model';
+import apiService from '../services/api.js';
+import PlanetModel from '../models/Planet.model.js';
+import PersonModel from '../models/Person.model.js';
 
 const { model, array, optional, map, boolean } = types;
 
@@ -15,34 +15,96 @@ const StarWarsStore = model('StarWarsStore', {
 })
   .actions(self => ({
     async afterCreate() {
-      const people = await self.fetchPeople();
-      const planets = await self.fetchPlanets(true);
-      // map up person models to residents
-      planets.forEach(planet => {
-        planet.residents = (planet.residents || []).map(residentUrl => {
-          const person = people.find(person => person.url === residentUrl);
-          return person || null;
+      try {
+        // Optimized: Single API call that gets both planets and people
+        await self.fetchPlanetsWithPeople();
+      } catch (error) {
+        console.error('Error in afterCreate:', error);
+        // Fallback to separate calls if optimized call fails
+        await self.fetchDataSeparately();
+      }
+    },
+
+    // Optimized method - gets both planets and people in one call
+     
+   async fetchPlanetsWithPeople() {
+      self.setLoadingPlanets(true);
+      self.setLoadingPeople(true);
+      
+      try {
+        const response = await apiService.getPlanetsWithPeople();
+        
+        // Response format: { planets: [...], people: [...] }
+        if (response.data.planets && response.data.people) {
+          self.setPlanets(response.data.planets);
+          self.setPeople(response.data.people);
+        } else {
+          throw new Error('Unexpected response format');
+        }
+      } catch (error) {
+        console.error('Error fetching planets with people:', error);
+        throw error;
+      } finally {
+        self.setLoadingPlanets(false);
+        self.setLoadingPeople(false);
+      }
+    },
+
+    // Fallback method - separate API calls
+    async fetchDataSeparately() {
+      try {
+        const [peopleResponse, planetsResponse] = await Promise.all([
+          self.fetchPeople(),
+          self.fetchPlanets(true)
+        ]);
+
+        const people = peopleResponse;
+        const planets = planetsResponse;
+
+        // Map residents to people objects
+        planets.forEach(planet => {
+          planet.residents = (planet.residents || []).map(residentUrl => {
+            const person = people.find(person => person.name === residentUrl);
+            return person || null;
+          });
         });
-      });
-      self.setPlanets(planets);
+
+        self.setPlanets(planets);
+      } catch (error) {
+        console.error('Error in fetchDataSeparately:', error);
+        throw error;
+      }
     },
 
     async fetchPlanets(skipSetting = false) {
       self.setLoadingPlanets(true);
-      const { data } = await apiService.getPlanets();
-      self.setLoadingPlanets(false);
+        try {
+      const response = await apiService.getPlanets();
+const data = response.data;
+       self.setLoadingPlanets(false);
       if (!skipSetting) {
         self.setPlanets(data);
       } else {
         return data;
+      }} catch (error) {
+        self.setLoadingPlanets(false);
+        throw error;
       }
+
     },
     async fetchPeople() {
       self.setLoadingPeople(true);
-      const { data } = await apiService.getPeople();
+      try{
+        const response = await apiService.getPeople();
+const data = response.data;
       self.setLoadingPeople(false);
       self.setPeople(data);
       return data;
+       } catch (error) {
+        self.setLoadingPeople(false);
+        throw error;
+      }
+
     },
 
     setLoadingPlanets(bool) {
@@ -83,6 +145,17 @@ const StarWarsStore = model('StarWarsStore', {
     getPerson(personId) {
       return self.people.find(person => person.id === parseInt(personId));
     },
+    
+
+    // Helper computed values
+    get isDataLoaded() {
+      return self.planets.length > 0 && self.people.length > 0;
+    },
+
+    get isLoading() {
+      return self.loadingPlanets || self.loadingPeople;
+    },
   }));
 
 export default StarWarsStore;
+

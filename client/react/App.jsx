@@ -35,7 +35,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Navigate to="/planets" replace />} />
         <Route path="/people" element={<People />} />
-        <Route path="/person/:residentId" element={<Resident />} />
+        <Route path="/people/:residentId" element={<Resident />} />
         <Route path="/planets" element={<Planets />} />
         <Route path="/planets/:planetId" element={<Planet />} />
         <Route path="/planets/:planetId/residents/:residentId" element={<Resident />} />

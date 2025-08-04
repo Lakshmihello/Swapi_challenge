@@ -1,5 +1,5 @@
-module.exports = {
-  sorter,
+export {
+  sorter
 };
 
 function sorter(field, objectList, direction = 'asc') {

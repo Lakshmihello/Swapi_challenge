@@ -1,6 +1,6 @@
 import { types } from 'mobx-state-tree';
 
-import PersonModel from './Person.model';
+import PersonModel from './Person.model.js';
 
 const { model, number, string, array, maybeNull } = types;
 

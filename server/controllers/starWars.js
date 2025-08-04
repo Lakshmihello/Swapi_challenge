@@ -1,9 +1,13 @@
-const { default: axios } = require('axios');
+import axios from 'axios';
+import https from 'https';
 
-const api = 'https://swapi.dev/api';
+const api = 'https://swapi.py4e.com/api';  // use mirror api to avoid CORS issues or the ssl certificate issue
+
+// const api = 'https://swapi.dev/api';
+
 const cache = {}; // cache not frozen for this file, but outputs to other files will be frozen
 
-module.exports = {
+export {
   getPeople,
   getPlanets,
   getPlanetsWithResidents,
@@ -27,7 +31,7 @@ async function getPlanetsWithResidents() {
     getPeople(),
   ]);
   // cheater way to deep clone an object
-  const planetList = JSON.parse(JSON.stringify(Object.values(planets)));
+  const planetList = Object.values(planets).map(p => ({ ...p }));
   const peopleList = JSON.parse(JSON.stringify(Object.values(people)));
 
   planetList.forEach(planet => {
@@ -50,17 +54,33 @@ async function getResults(rootApi, cacheKey) {
   }
 
   async function getPage(nextPage, skipNext = true) {
-    const { data } = await axios.get(nextPage);
-    data.forEach(item => {
-      const id = item.url.replace(rootApi, '').replace(/\//g, '');
-      item.id = parseInt(id); // make things easier for the front-end
-      cache[cacheKey][id] = item;
+    const { data: firstPageData } = await axios.get(nextPage);
+
+    // Extract total count and page size
+    const totalCount = firstPageData.count;
+    const pageSize = firstPageData.results.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    // Generate all page URLs
+    const pageUrls = Array.from({ length: totalPages }, (_, i) => `${nextPage}?page=${i + 1}`);
+
+    // Fetch all pages in parallel
+    const responses = await Promise.all(
+      pageUrls.map(url => axios.get(url))
+      // If SSL issue occurs, use this instead:
+      // pageUrls.map(url => axios.get(url, { httpsAgent: agent }))
+    );
+
+    // Process each page's results
+    responses.forEach(({ data }) => {
+      data.results.forEach(item => {
+        const id = item.url.replace(rootApi, '').replace(/\//g, '');
+        item.id = parseInt(id);
+        cache[cacheKey][id] = item;
+      });
     });
-    if (!skipNext && next) {
-      return getPage(next, false);
-    } else {
-      return data;
-    }
+
+    return Object.values(cache[cacheKey]);
   }
 
   if (Object.keys(cache[cacheKey]).length === 0) {

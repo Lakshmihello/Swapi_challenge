@@ -1,13 +1,17 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+import path from 'path';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import webpack from 'webpack';
+import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const outputPath = path.resolve(__dirname, 'dist');
 
 // !!! This configuration is NOT production ready.
 
-module.exports = {
+export default {
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
@@ -33,14 +37,7 @@ module.exports = {
       {
         test: /\.([jt]sx?)$/,
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-            // options: {
-            //   plugins: ['react-refresh/babel'],
-            // },
-          },
-        ],
+        use: [ 'babel-loader'],
       },
       {
         test: /\.s?css$/i,

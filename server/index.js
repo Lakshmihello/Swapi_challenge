@@ -1,16 +1,20 @@
-const express = require('express');
-const webpack = require('webpack');
-const historyApiFallback = require('connect-history-api-fallback');
-const webpackDevMiddleware = require('webpack-dev-middleware');
-const webpackHotMiddleware = require('webpack-hot-middleware');
+import express from 'express';
+import webpack from 'webpack';
+import historyApiFallback from 'connect-history-api-fallback';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
+import { createRequire } from 'module';
+import apiRoutes from './api/index.js';
+
+const require = createRequire(import.meta.url);
+const { default: config } = await import('../webpack.config.js');
 
 const app = express();
-const config = require('../webpack.config.js');
 const compiler = webpack(config);
 const port = process.env.PORT || 3000;
 
 // use any express routes (fallback should be defined in each route file)
-app.use('/api', require('./api'));
+app.use('/api', apiRoutes);
 
 // if not found in routes, use history fallback api
 // (redirect to browser so react-router can pick it up)

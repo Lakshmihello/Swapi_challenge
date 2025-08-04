@@ -30,3 +30,4 @@ Please analyze the current application and provide ideas and steps that might be
 ## Bonus Challenge - Wookiee!
 
 We will not judge you _at all_ for not performing this challenge. However, it is added for your enjoyment for a much harder coding challenge if you so desire. The swapi api has an optional query param of `format=wookiee` that converts the response to wookiee! The challenge is to append that query param to all api requests and get the app still working. Good luck!
+
